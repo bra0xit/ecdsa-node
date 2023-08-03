@@ -1,7 +1,7 @@
 import { useState } from "react";
 import server from "./server";
 
-function Transfer({ address, setBalance }) {
+function Transfer({ address, setBalance, isPrivateKeyCorrect }) {
   const [sendAmount, setSendAmount] = useState("");
   const [recipient, setRecipient] = useState("");
 
@@ -10,17 +10,23 @@ function Transfer({ address, setBalance }) {
   async function transfer(evt) {
     evt.preventDefault();
 
-    try {
-      const {
-        data: { balance },
-      } = await server.post(`send`, {
-        sender: address,
-        amount: parseInt(sendAmount),
-        recipient,
-      });
-      setBalance(balance);
-    } catch (ex) {
-      alert(ex.response.data.message);
+    console.log("isPrivateKeyCorrect value:" + isPrivateKeyCorrect);
+
+    if (!isPrivateKeyCorrect) {
+      console.log("Must input correct private key first");
+    } else {
+      try {
+        const {
+          data: { balance },
+        } = await server.post(`send`, {
+          sender: address,
+          amount: parseInt(sendAmount),
+          recipient,
+        });
+        setBalance(balance);
+      } catch (ex) {
+        alert(ex.response.data.message);
+      }
     }
   }
 
